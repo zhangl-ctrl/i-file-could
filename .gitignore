@@ -1,0 +1,5 @@
+# 通用忽略规则
+.DS_Store
+*.log
+*.tmp
+*.swp
