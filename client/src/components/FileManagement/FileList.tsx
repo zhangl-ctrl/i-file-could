@@ -1,9 +1,10 @@
+import { nanoid } from "nanoid";
 import React, { Fragment } from "react";
 import { useState, useEffect } from "react";
-import { Card, Input, Button, Row, Col, Space } from "antd";
-import { PlusSquareOutlined } from "@ant-design/icons";
-import { nanoid } from "nanoid";
+import { PlusSquareOutlined, DownOutlined } from "@ant-design/icons";
+import { Card, Input, Button, Row, Col, Space, Dropdown } from "antd";
 import FileIcon from "@/components/FileManagement/FileIcon";
+import type { MenuProps } from "antd";
 
 export type TableFile = {
   id: number;
@@ -347,12 +348,23 @@ const tableColumns = [
   {
     id: 5,
     title: "最近更新",
-    width: 6,
+    width: 4,
   },
   {
     id: 6,
     title: "操作",
-    width: 2,
+    width: 4,
+  },
+];
+
+const items: MenuProps["items"] = [
+  {
+    key: "1",
+    label: "查看",
+  },
+  {
+    key: "2",
+    label: "删除",
   },
 ];
 
@@ -457,8 +469,20 @@ const FileList: React.FC = () => {
                 <Col span={2}>{file.size}</Col>
                 <Col span={2}>{file.fileType}</Col>
                 <Col span={2}>{file.bucketType}</Col>
-                <Col span={6}>{file.lastUpdated}</Col>
-                <Col span={2}>操作</Col>
+                <Col span={4}>{file.lastUpdated}</Col>
+                <Col span={4}>
+                  <Space>
+                    <span className="text-[#1677ff]">详情</span>
+                    <Dropdown menu={{ items }} trigger={["click"]}>
+                      <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                          <span>更多</span>
+                          <DownOutlined />
+                        </Space>
+                      </a>
+                    </Dropdown>
+                  </Space>
+                </Col>
               </Row>
             </Fragment>
           );

@@ -9,7 +9,7 @@ const { Header, Content } = Layout;
 
 const MainContainer: React.FC = () => {
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
   const dispatch = useDispatch();
   const collapsed = useSelector((state: any) => state.status.collapsed);
