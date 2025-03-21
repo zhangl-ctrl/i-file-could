@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout } from "antd";
-import MainSider from "@/components/MainSider";
-import MainContainer from "@/components/MainContainer";
+import MainSider from "@/layout/MainSider";
+import MainContainer from "@/layout/MainContainer";
 
 const MainLayout: React.FC = () => {
   return (
