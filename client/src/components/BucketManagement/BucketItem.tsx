@@ -7,6 +7,9 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { CloudStorageInfo } from "./type";
+import Text from "@/components/Text";
+import resourc_logo from "@/assets/images/resourc_logo.png";
+import { useNavigate } from "react-router-dom";
 
 const actions: React.ReactNode[] = [
   <div>
@@ -19,18 +22,31 @@ const actions: React.ReactNode[] = [
   </div>,
 ];
 
-const Text: React.FC<{ text: string | number }> = ({ text }) => {
-  return <div className="text-[14px] text-[#8c8c8c]">{text}</div>;
-};
-
 const BucketItem: React.FC<{ bucket: CloudStorageInfo }> = ({ bucket }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const handleNavigateBucket = (bucket: CloudStorageInfo) => {
+    // console.log("查看存储桶详情内容");
+    navigate(`/file-management/${bucket.cloudOrgin}/${bucket.bucketName}`);
+  };
+
   return (
     <Card loading={loading} actions={actions} style={{ width: 400 }}>
       <Row justify="space-between">
         <Col>
-          <div className="font-medium text-[18px]">{bucket.bucketName}</div>
-          <Text text={bucket.cloudOrgin} />
+          <div className="flex items-center cursor-pointer">
+            <img
+              className="h-[40px] mr-[10px]"
+              src={resourc_logo}
+              alt="resourc_logo"
+            />
+            <div onClick={() => handleNavigateBucket(bucket)}>
+              <div className="font-medium text-[18px] hover:text-[#1677ff]">
+                {bucket.bucketName}
+              </div>
+              <Text text={bucket.cloudOrgin} />
+            </div>
+          </div>
         </Col>
         <Col>
           <EllipsisOutlined className="cursor-pointer" />

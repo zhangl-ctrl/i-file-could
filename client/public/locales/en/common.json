@@ -1,0 +1,23 @@
+{
+  "fileUpload": "File upload",
+  "fileList": "File list",
+  "checkOrDragFileToUpload": "Click or drag the file here to upload",
+  "SupportTypeOfFile": "Support any type of file, a single file maximum 500MB",
+  "uploadFile": "Upload file",
+  "detail": "Detail",
+  "more": "More",
+  "fileManagement": "File management",
+  "bucketManagement": "Bucket management",
+  "operationLog": "operation Log",
+  "dataMonitoring": "Data monitoring",
+  "cloudVendorManagement": "Cloud vendor management",
+  "enterFileName": "Please enter file name",
+  "createFolder": "Create Folder",
+  "fileName": "File name",
+  "fileSize": "File size",
+  "fileType": "File type",
+  "storageType": "Storage type",
+  "lastUpdated": "Last updated",
+  "operation": "Operation",
+  "createBucket": "Create bucket"
+}

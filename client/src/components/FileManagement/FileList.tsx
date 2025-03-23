@@ -5,6 +5,7 @@ import { PlusSquareOutlined, DownOutlined } from "@ant-design/icons";
 import { Card, Input, Button, Row, Col, Space, Dropdown } from "antd";
 import FileIcon from "@/components/FileManagement/FileIcon";
 import type { MenuProps } from "antd";
+import { useTranslation } from "react-i18next";
 
 export type TableFile = {
   id: number;
@@ -324,35 +325,40 @@ const files: TableFile[] = [
     children: null,
   },
 ];
+const Text: React.FC<{ text: string }> = ({ text }) => {
+  const { t } = useTranslation("common");
+  return <>{t(text)}</>;
+};
+
 const tableColumns = [
   {
     id: 1,
-    title: "文件名",
+    title: <Text text="fileName" />,
     width: 10,
   },
   {
     id: 2,
-    title: "文件大小",
+    title: <Text text="fileSize" />,
     width: 2,
   },
   {
     id: 3,
-    title: "文件类型",
+    title: <Text text="fileType" />,
     width: 2,
   },
   {
     id: 4,
-    title: "存储类型",
+    title: <Text text="storageType" />,
     width: 2,
   },
   {
     id: 5,
-    title: "最近更新",
+    title: <Text text="lastUpdated" />,
     width: 4,
   },
   {
     id: 6,
-    title: "操作",
+    title: <Text text="operation" />,
     width: 4,
   },
 ];
@@ -378,6 +384,7 @@ const Crumbs = ({
   const handleNavigateCrumbs = (path: Crumbs) => {
     onUpdatecrumbs(path);
   };
+
   return (
     <div>
       {(crumbs || []).map((path: any, index: number) => {
@@ -422,18 +429,23 @@ const FileList: React.FC = () => {
     const id = nanoid();
     setCrumbs([{ id, title: "根目录", files }]);
   }, []);
+  const { t } = useTranslation("common");
 
   return (
     <Card>
       <div className="flex justify-between">
         <Space align="center">
-          <span className="font-semibold text-[16px]">文件列表</span>
+          <span className="font-semibold text-[16px]">{t("fileList")}</span>
           <Crumbs crumbs={crumbs} onUpdatecrumbs={handleUpdatecrumbs} />
         </Space>
-        <div className="w-[330px] flex justify-between">
-          <Search placeholder="请输入文件名" style={{ width: 200 }} />
-          <Button type="primary" icon={<PlusSquareOutlined />}>
-            新建文件夹
+        <div className="flex justify-between">
+          <Search placeholder={t("enterFileName")} style={{ width: 200 }} />
+          <Button
+            type="primary"
+            icon={<PlusSquareOutlined />}
+            className="ml-[10px]"
+          >
+            {t("createFolder")}
           </Button>
         </div>
       </div>
@@ -472,11 +484,11 @@ const FileList: React.FC = () => {
                 <Col span={4}>{file.lastUpdated}</Col>
                 <Col span={4}>
                   <Space>
-                    <span className="text-[#1677ff]">详情</span>
+                    <span className="text-[#1677ff]">{t("detail")}</span>
                     <Dropdown menu={{ items }} trigger={["click"]}>
                       <a onClick={(e) => e.preventDefault()}>
                         <Space>
-                          <span>更多</span>
+                          <span>{t("more")}</span>
                           <DownOutlined />
                         </Space>
                       </a>
