@@ -1,39 +1,38 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Row, Col, Upload, Button, Select } from "antd";
-import { UploadOutlined, ToTopOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Upload } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import QiniuManger from "@/utils/qiniuManger";
+import { useSelector } from "react-redux";
+// import {  }
 
 const { Dragger } = Upload;
 
 const FileUpload: React.FC = () => {
   const { t } = useTranslation("common");
-  const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
+  const token = useSelector(
+    (state: any) => state.cloudService.qiniuService.token
+  );
+  const handleUploadFile = (event: any) => {
+    const file = event.file;
+    const key = event.file.name;
+    const qiniuManger = new QiniuManger(file, key, token);
+    qiniuManger.uploadFile();
   };
+
   return (
     <Card>
       <div className="flex justify-between">
         <div className="font-semibold text-[16px]">{t("fileUpload")}</div>
-        <div className="flex justify-between">
-          {/* <Select
-            defaultValue="lucy"
-            style={{ width: 120 }}
-            onChange={handleChange}
-            options={[
-              { value: "jack", label: "Jack" },
-              { value: "lucy", label: "Lucy" },
-              { value: "Yiminghe", label: "yiminghe" },
-              { value: "disabled", label: "Disabled", disabled: true },
-            ]}
-          /> */}
-          {/* <Button type="primary" icon={<ToTopOutlined />} className="ml-[10px]">
-            {t("uploadFile")}
-          </Button> */}
-        </div>
       </div>
       <Row className="mt-[16px]">
         <Col span={24}>
-          <Dragger>
+          <Dragger
+            name="file"
+            multiple={false}
+            onChange={handleUploadFile}
+            beforeUpload={() => false}
+          >
             <p className="ant-upload-drag-icon">
               <UploadOutlined />
             </p>

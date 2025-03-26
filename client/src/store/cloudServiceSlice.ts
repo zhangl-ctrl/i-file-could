@@ -3,28 +3,40 @@ import { Cloud } from "./type";
 
 const initialState: Cloud = {
   qiniuService: {
-    accessKey: "tSrg9nWcoMnxi8DCjs56spHkJAO_9iVhUjsbEnF5",
-    secretKey: "JXjo8AhXVxARq6GZzth22N-1fxA308wYUmPW0ziz",
+    accessKey: "",
+    secretKey: "",
+    token: "",
+    buckets: [],
+    bucketTokens: {},
   },
   tencentService: {
     accessKey: "tSrg9nWcoMnxi8DCjs56spHkJAO_9iVhUjsbEnF5",
     secretKey: "JXjo8AhXVxARq6GZzth22N-1fxA308wYUmPW0ziz",
+    token: "",
   },
 };
 
 const cloudServiceSlice = createSlice({
-  name: "status",
+  name: "cloudServiceSlice",
   initialState,
   reducers: {
-    setServiceKey: (state, action) => {
+    setQiniuServiceKey: (state, action) => {
       const {
         payload: { accessKey, secretKey },
       } = action;
       state.qiniuService.accessKey = accessKey;
       state.qiniuService.secretKey = secretKey;
     },
+    setQiniuToken: (state, action) => {
+      const { payload } = action;
+      state.qiniuService.token = payload;
+    },
+    setQiniuBuckets: (state, action) => {
+      state.qiniuService.buckets = action.payload;
+    },
   },
 });
 
-export const { setServiceKey } = cloudServiceSlice.actions;
+export const { setQiniuServiceKey, setQiniuToken, setQiniuBuckets } =
+  cloudServiceSlice.actions;
 export default cloudServiceSlice.reducer;

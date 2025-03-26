@@ -1,13 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { TabsProps } from "antd";
 import { Row, Col, Button, Tabs, Input, Space } from "antd";
 import { useTranslation } from "react-i18next";
 import { PlusSquareOutlined, UndoOutlined } from "@ant-design/icons";
 import BucketList from "@/components/BucketManagement/BucketList";
+import { useSelector, useDispatch } from "react-redux";
+import { getQiniuBuckets } from "@/api/serviceToken";
+import { setQiniuBuckets } from "@/store/cloudServiceSlice";
 
 const { Search } = Input;
 
-const BucketContainer: React.FC = () => {
+const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
+  const dispatch = useDispatch();
+  const { accessKey, secretKey } = useSelector(
+    (state: any) => state.cloudService.qiniuService
+  );
+  const [buckets, setBuckets] = useState([]);
+  async function setBucketsToQiniu() {
+    try {
+      const res = await getQiniuBuckets(accessKey, secretKey);
+      dispatch(setQiniuBuckets(res));
+      setBuckets(res);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  async function setBucketsToTencent() {}
+  useEffect(() => {
+    if (type === "qiniu") {
+      setBucketsToQiniu();
+    } else if (type === "tencent") {
+      setBucketsToTencent();
+    }
+  }, []);
+
+  const handleRefresh = async () => {
+    try {
+      const res = await getQiniuBuckets(accessKey, secretKey);
+      dispatch(setQiniuBuckets(res));
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const onSearch = () => {
     console.log("搜索");
   };
@@ -24,14 +58,16 @@ const BucketContainer: React.FC = () => {
         </Col>
         <Col>
           <Space>
-            <Button icon={<UndoOutlined />}>刷新存储桶</Button>
+            <Button icon={<UndoOutlined />} onClick={handleRefresh}>
+              刷新存储桶
+            </Button>
             <Button type="primary" icon={<PlusSquareOutlined />}>
               创建存储桶
             </Button>
           </Space>
         </Col>
       </Row>
-      <BucketList />
+      <BucketList buckets={buckets} />
     </>
   );
 };
@@ -39,18 +75,13 @@ const BucketContainer: React.FC = () => {
 const items: TabsProps["items"] = [
   {
     key: "1",
-    label: "全部",
-    children: <BucketContainer />,
+    label: "七牛云 OSS",
+    children: <BucketContainer type="qiniu" />,
   },
   {
     key: "2",
-    label: "七牛云 OSS",
-    children: <BucketContainer />,
-  },
-  {
-    key: "3",
     label: "腾讯云 COS",
-    children: <BucketContainer />,
+    children: <BucketContainer type="tencent" />,
   },
 ];
 

@@ -149,7 +149,7 @@ class Http {
 }
 
 const http = new Http({
-  baseURL: "http://localhost:3000",
+  baseURL: "http://localhost:3006",
   timeout: 15000,
 });
 

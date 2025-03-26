@@ -1,10 +1,9 @@
 export interface CloudStorageInfo {
-  id: number;
+  id: string;
+  bucketInfo: any;
   bucketName: string;
-  cloudOrgin: string;
-  storageTotalCapacity: string;
-  storageCurrentCapacity: string;
-  totalRequests: number;
-  visitTraffic: string;
-  totalFiles: number;
+  cloudName: string;
+  cloudService: string;
+  region: string;
+  auth: string;
 }

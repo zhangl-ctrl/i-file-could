@@ -1,23 +1,31 @@
-import React, { useState } from "react";
-import { Card, Flex, Row, Col, Input, Modal, message, Button } from "antd";
-// import cloudService from "@/assets/images/cloudService.png";
+import React, { useEffect, useState } from "react";
+import { Card, Flex, Row, Col, Input, Modal, message } from "antd";
 import qiniu_logo from "@/assets/images/qiniu_logo.png";
 import tencent_logo from "@/assets/images/tencent_logo.png";
 import { useTranslation } from "react-i18next";
 import Text from "@/components/Text";
 import { useSelector, useDispatch } from "react-redux";
 import Copy from "@/components/Copy";
-import { setServiceKey } from "@/store/cloudServiceSlice";
-import { PlusSquareOutlined } from "@ant-design/icons";
+import { setQiniuServiceKey } from "@/store/cloudServiceSlice";
 
 const CloudSetup: React.FC = () => {
-  const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
+  const { t } = useTranslation("common");
+  const [messageApi, contextHolder] = message.useMessage();
   const qiniu = useSelector((state: any) => state.cloudService.qiniuService);
+  const [proof, setProof] = useState({
+    accessKey: qiniu.accessKey,
+    secretKey: qiniu.secretKey,
+  });
   // 控制访问凭证 Modal
   const [isProofModalOpen, setIsProofModalOpen] = useState(false);
   const handleProofConfirm = () => {
-    dispatch(setServiceKey(proof));
+    dispatch(setQiniuServiceKey(proof));
+    const qiniuKey = {
+      accessKey: proof.accessKey,
+      secretKey: proof.secretKey,
+    };
+    localStorage.setItem("qiniuKey", JSON.stringify(qiniuKey));
     setIsProofModalOpen(false);
     messageApi.success("更新凭证成功");
   };
@@ -27,12 +35,13 @@ const CloudSetup: React.FC = () => {
   const handleOpenProofModal = () => {
     setIsProofModalOpen(true);
   };
-
-  const [proof, setProof] = useState({
-    accessKey: qiniu.accessKey,
-    secretKey: qiniu.secretKey,
-  });
-  const { t } = useTranslation("common");
+  useEffect(() => {
+    const qiniuKey = localStorage.getItem("qiniuKey");
+    if (qiniuKey) {
+      const { accessKey, secretKey } = JSON.parse(qiniuKey);
+      setProof({ accessKey, secretKey });
+    }
+  }, []);
 
   return (
     <>
@@ -42,11 +51,6 @@ const CloudSetup: React.FC = () => {
             {t("cloudVendorManagement")}
           </span>
         </Col>
-        {/* <Col>
-          <Button type="primary" icon={<PlusSquareOutlined />}>
-            {t("createBucket")}
-          </Button>
-        </Col> */}
       </Row>
       <Flex gap="large">
         <Card style={{ width: 400 }}>
@@ -82,10 +86,10 @@ const CloudSetup: React.FC = () => {
                 <div className="flex">
                   <Input
                     className="w-[200px]"
-                    value={qiniu.accessKey}
+                    value={proof.accessKey}
                     disabled
                   />
-                  <Copy text={qiniu.accessKey} />
+                  <Copy text={proof.accessKey} />
                 </div>
               </div>
             </Col>
@@ -98,10 +102,10 @@ const CloudSetup: React.FC = () => {
                 <div className="flex">
                   <Input
                     className="w-[200px]"
-                    value={qiniu.secretKey}
+                    value={proof.secretKey}
                     disabled
                   />
-                  <Copy text={qiniu.secretKey} />
+                  <Copy text={proof.secretKey} />
                 </div>
               </div>
             </Col>
