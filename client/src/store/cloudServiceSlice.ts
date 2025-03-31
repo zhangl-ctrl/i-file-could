@@ -20,6 +20,7 @@ const cloudServiceSlice = createSlice({
   name: "cloudServiceSlice",
   initialState,
   reducers: {
+    // 设置七牛秘钥
     setQiniuServiceKey: (state, action) => {
       const {
         payload: { accessKey, secretKey },
@@ -27,10 +28,12 @@ const cloudServiceSlice = createSlice({
       state.qiniuService.accessKey = accessKey;
       state.qiniuService.secretKey = secretKey;
     },
+    // 设置七牛token，每个存储桶对应一个token
     setQiniuToken: (state, action) => {
-      const { payload } = action;
-      state.qiniuService.token = payload;
+      const { bucketName, token } = action.payload;
+      state.qiniuService.bucketTokens[bucketName] = token;
     },
+    // 设置七牛云存储桶
     setQiniuBuckets: (state, action) => {
       state.qiniuService.buckets = action.payload;
     },

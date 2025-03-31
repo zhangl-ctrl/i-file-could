@@ -8,19 +8,31 @@ import { Token } from "./type";
 // 获取七牛云 token
 export const getQiniuToken = (
   accessKey: string,
-  secretKey: string
-  // bucket: string
+  secretKey: string,
+  bucket: string
 ): Promise<Token> => {
-  return http.post("/qiniu/getToken", {
+  return http.post("/qiniu/getQiniuToken", {
     accessKey,
     secretKey,
-    // bucket,
+    bucket,
   });
 };
 // 获取七牛云存储桶
 export const getQiniuBuckets = (accessKey: string, secretKey: string) => {
-  return http.post("/qiniu/getBuckets", {
+  return http.post("/qiniu/getQiniuBuckets", {
     accessKey,
     secretKey,
+  });
+};
+// 根据七牛云存储桶获取桶内文件
+export const getQiniuFilelist = (
+  accessKey: string,
+  secretKey: string,
+  bucket: string
+) => {
+  return http.post("/qiniu/getQiniuFilelist", {
+    accessKey,
+    secretKey,
+    bucket,
   });
 };

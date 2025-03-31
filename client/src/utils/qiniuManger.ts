@@ -1,39 +1,22 @@
 import * as qiniu from "qiniu-js";
 
+export type UploadObserver = {
+  next: (res: any) => void;
+  error: (err: any) => void;
+  complete: (res: any) => void;
+};
+
 class QiniuManger {
-  file: File;
-  key: string;
-  token: string;
-
-  constructor(file: File, key: string, token: string) {
-    this.file = file;
-    this.key = key;
-    this.token = token;
-  }
-
-  uploadFile() {
+  uploadFile(file: File, key: string, token: string) {
     const config = {};
     const putExtra = {};
-    const observable = qiniu.upload(
-      this.file,
-      this.key,
-      this.token,
-      putExtra,
-      config
-    );
-    const observer = {
-      next(res: any) {
-        console.log("next", res);
-      },
-      error(err: Error) {
-        console.log("error", err);
-      },
-      complete(res: any) {
-        console.log("complete", res);
+    return {
+      observer: (observer: UploadObserver) => {
+        const observable = qiniu.upload(file, key, token, putExtra, config);
+        observable.subscribe(observer);
       },
     };
-    observable.subscribe(observer); // 上传开始
   }
 }
 
-export default QiniuManger;
+export default new QiniuManger();

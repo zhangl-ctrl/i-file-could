@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { PlusSquareOutlined, UndoOutlined } from "@ant-design/icons";
 import BucketList from "@/components/BucketManagement/BucketList";
 import { useSelector, useDispatch } from "react-redux";
-import { getQiniuBuckets } from "@/api/serviceToken";
+import { getQiniuBuckets } from "@/api/qiniuService";
 import { setQiniuBuckets } from "@/store/cloudServiceSlice";
 
 const { Search } = Input;
@@ -16,6 +16,8 @@ const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
     (state: any) => state.cloudService.qiniuService
   );
   const [buckets, setBuckets] = useState([]);
+  const [searchKey, setSearchKey] = useState<string>("");
+  // 获取七牛云的存储桶列表并且设置到 store 中
   async function setBucketsToQiniu() {
     try {
       const res = await getQiniuBuckets(accessKey, secretKey);
@@ -25,6 +27,7 @@ const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
       console.error(err);
     }
   }
+  // 获取腾讯云的存储桶列表
   async function setBucketsToTencent() {}
   useEffect(() => {
     if (type === "qiniu") {
@@ -34,17 +37,18 @@ const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
     }
   }, []);
 
-  const handleRefresh = async () => {
-    try {
-      const res = await getQiniuBuckets(accessKey, secretKey);
-      dispatch(setQiniuBuckets(res));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const onSearch = () => {
-    console.log("搜索");
-  };
+  // const handleRefresh = async () => {
+  //   try {
+  //     const res = await getQiniuBuckets(accessKey, secretKey);
+  //     dispatch(setQiniuBuckets(res));
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+  // const onSearch = (key: string) => {
+  //   console.log(key);
+  //   // setSearchKey();
+  // };
 
   return (
     <>
@@ -52,13 +56,14 @@ const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
         <Col>
           <Search
             placeholder="搜索存储桶"
-            onSearch={onSearch}
+            onSearch={(key: string) => setSearchKey(key)}
             style={{ width: 200 }}
           />
         </Col>
         <Col>
           <Space>
-            <Button icon={<UndoOutlined />} onClick={handleRefresh}>
+            {/* <Button icon={<UndoOutlined />} onClick={handleRefresh}> */}
+            <Button icon={<UndoOutlined />} onClick={setBucketsToQiniu}>
               刷新存储桶
             </Button>
             <Button type="primary" icon={<PlusSquareOutlined />}>
@@ -67,7 +72,7 @@ const BucketContainer: React.FC<{ type: string }> = ({ type }) => {
           </Space>
         </Col>
       </Row>
-      <BucketList buckets={buckets} />
+      <BucketList buckets={buckets} searchKey={searchKey} />
     </>
   );
 };
@@ -101,7 +106,7 @@ const BucketManagement: React.FC = () => {
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col span={24}>
           <Tabs
             popupClassName="bg-[red]"
             defaultActiveKey="1"

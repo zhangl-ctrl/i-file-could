@@ -3,7 +3,8 @@ import qiniuController from "../controllers/qiniuController";
 
 const router = new Router();
 
-router.post("/qiniu/getToken", qiniuController.getToken);
-router.post("/qiniu/getBuckets", qiniuController.getBuckets);
+router.post("/qiniu/getQiniuToken", qiniuController.getToken);
+router.post("/qiniu/getQiniuBuckets", qiniuController.getBuckets);
+router.post("/qiniu/getQiniuFilelist", qiniuController.getFileList);
 
 export default router;

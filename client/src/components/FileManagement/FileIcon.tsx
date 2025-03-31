@@ -75,7 +75,7 @@ const iconMap = new Map([
 const FileIcon: React.FC<{
   filename: string;
   isFolder: boolean;
-  subItem: TableFile[] | null;
+  subItem?: TableFile[] | null;
 }> = ({ filename, isFolder, subItem }) => {
   const extension = filename.split(".").at(-1) || "";
 

@@ -1,8 +1,24 @@
 import { Flex } from "antd";
 import BucketItem from "./BucketItem";
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 
-const BucketList: React.FC<{ buckets: any }> = ({ buckets }) => {
+const BucketList: React.FC<{ buckets: any; searchKey: string }> = ({
+  buckets,
+  searchKey,
+}) => {
+  const [filterBuckets, setFilterBuckets] = useState(buckets);
+  // console.log("searchKey", searchKey);
+
+  // useEffect(() => {
+  //   if (searchKey !== "") {
+  //     setFilterBuckets((filterBuckets: any) => {
+  //       return filterBuckets.filter((bucket: any) => {
+  //         return bucket.bucketName === searchKey;
+  //       });
+  //     });
+  //   }
+  // }, [searchKey]);
+
   return (
     <>
       <Flex wrap gap="large">

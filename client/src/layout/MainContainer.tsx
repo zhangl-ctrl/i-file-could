@@ -92,6 +92,7 @@ const MainContainer: React.FC = () => {
         style={{
           margin: 16,
           minHeight: 280,
+          height: "100%",
           // background: colorBgContainer,
         }}
       >

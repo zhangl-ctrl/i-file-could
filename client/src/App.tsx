@@ -4,7 +4,7 @@ import { useRoutes } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getQiniuToken } from "@/api/serviceToken";
+import { getQiniuToken } from "@/api/qiniuService";
 import { setQiniuToken, setQiniuServiceKey } from "@/store/cloudServiceSlice";
 import { useDispatch } from "react-redux";
 
@@ -12,17 +12,17 @@ const App = () => {
   const outlet = useRoutes(router);
   const dispatch = useDispatch();
   const qiniu = useSelector((state: any) => state.cloudService.qiniuService);
-  useEffect(() => {
-    getQiniuToken(qiniu.accessKey, qiniu.secretKey).then(
-      (res) => {
-        const { token } = res;
-        dispatch(setQiniuToken(token));
-      },
-      (err) => {
-        console.error("Error info:" + err.message);
-      }
-    );
-  });
+  // useEffect(() => {
+  //   getQiniuToken(qiniu.accessKey, qiniu.secretKey).then(
+  //     (res) => {
+  //       const { token } = res;
+  //       dispatch(setQiniuToken(token));
+  //     },
+  //     (err) => {
+  //       console.error("Error info:" + err.message);
+  //     }
+  //   );
+  // });
   // 初始化 token
   useEffect(() => {
     const qiniuKey = localStorage.getItem("qiniuKey");
