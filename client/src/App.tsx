@@ -11,18 +11,6 @@ import { useDispatch } from "react-redux";
 const App = () => {
   const outlet = useRoutes(router);
   const dispatch = useDispatch();
-  const qiniu = useSelector((state: any) => state.cloudService.qiniuService);
-  // useEffect(() => {
-  //   getQiniuToken(qiniu.accessKey, qiniu.secretKey).then(
-  //     (res) => {
-  //       const { token } = res;
-  //       dispatch(setQiniuToken(token));
-  //     },
-  //     (err) => {
-  //       console.error("Error info:" + err.message);
-  //     }
-  //   );
-  // });
   // 初始化 token
   useEffect(() => {
     const qiniuKey = localStorage.getItem("qiniuKey");

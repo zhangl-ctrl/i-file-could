@@ -24,10 +24,12 @@ const colorMap: {
 };
 
 const UploadProgressList: React.FC<{
+  beginUpload: boolean;
   currentUploadFile: File[];
   onRemoveFile: (file: any) => void;
-  beginUpload: boolean;
 }> = ({ currentUploadFile, onRemoveFile, beginUpload }) => {
+  // console.log("currentUploadFile-----", currentUploadFile);
+
   // 文件上传进度组件是否折叠
   const [fold, setFold] = useState<boolean>(false);
   useEffect(() => {
@@ -56,7 +58,11 @@ const UploadProgressList: React.FC<{
                   return (
                     <div className="mb-[10px]" key={file.id}>
                       <Row className="flex justify-between">
-                        <Col>{file.fileName}</Col>
+                        <Col span={14}>
+                          <div className="overflow-hidden whitespace-nowrap text-ellipsis">
+                            {file.fileName.split("/").at(-1)}
+                          </div>
+                        </Col>
                         <Col>
                           {file.fileUploadInfo ? (
                             <span>

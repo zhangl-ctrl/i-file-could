@@ -1,6 +1,7 @@
 export type Status = {
   collapsed: boolean;
   language: string;
+  currentCrumbs: string[];
 };
 
 export type QiniuService = {

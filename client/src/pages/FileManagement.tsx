@@ -18,7 +18,7 @@ export default function FileManagement() {
   useEffect(() => {
     if (cloud === "qiniu") {
       const {
-        qiniuService: { accessKey, secretKey, bucketTokens },
+        qiniuService: { accessKey, secretKey },
       } = service;
       if (accessKey && secretKey) {
         getQiniuToken(accessKey, secretKey, bucket as string).then(
@@ -27,7 +27,7 @@ export default function FileManagement() {
             dispatch(setQiniuToken({ bucketName: bucket, token }));
           },
           (err) => {
-            console.error("error----", err);
+            console.error("error", err);
           }
         );
       }

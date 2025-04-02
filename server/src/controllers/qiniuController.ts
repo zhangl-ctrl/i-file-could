@@ -2,6 +2,7 @@ import Koa from "koa";
 import qiniu from "qiniu";
 import { nanoid } from "nanoid";
 import { fileType } from "./type";
+import errorHttpCode from "../common/errorHttpCode";
 
 function getBucketManager(accessKey: string, secretKey: string) {
   const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
@@ -216,6 +217,41 @@ const qiniuController = {
 
     // buildFileTree(fileList, "");
   },
+  // 创建存储桶
+  async createBucket(ctx: Koa.Context) {
+    const { bucket, accessKey, secretKey, regionId, auth } = ctx.request
+      .body as Record<string, any>;
+    const bucketManager = getBucketManager(accessKey, secretKey);
+    const options = {
+      regionId,
+    };
+    const res = await bucketManager.createBucket(bucket, options);
+    const { data, resp } = res;
+    ctx.body = {
+      code: resp.statusCode,
+      success: resp.statusCode === 200 ? true : false,
+      message: errorHttpCode[resp.statusCode!],
+      data: data,
+    };
+  },
+  // 删除存储桶
+  async deleteBucket(ctx: Koa.Context) {
+    const { bucket, accessKey, secretKey } = ctx.request.body as Record<
+      string,
+      any
+    >;
+    const bucketManager = getBucketManager(accessKey, secretKey);
+    const res = await bucketManager.deleteBucket(bucket);
+    const { data, resp } = res;
+    ctx.body = {
+      code: resp.statusCode,
+      success: resp.statusCode === 200 ? true : false,
+      message: errorHttpCode[resp.statusCode!],
+      data: data,
+    };
+  },
+  // 创建文件夹
+  async createDirectory(ctx: Koa.Context) {},
 };
 
 export default qiniuController;

@@ -59,7 +59,9 @@ class Http {
     if (res.code === 200) {
       return res.data;
     } else {
-      return Promise.reject(new Error(res.message || "Request failed"));
+      return Promise.reject(
+        new Error(response.data.message || "Request failed")
+      );
     }
   }
 

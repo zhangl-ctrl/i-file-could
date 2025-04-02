@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Row, Col, Upload, Button } from "antd";
+import { Card, Row, Col, Upload } from "antd";
 import type { UploadFile } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import qiniuManger from "@/utils/qiniuManger";
@@ -24,18 +24,17 @@ const FileUpload: React.FC = () => {
     (state: any) =>
       state.cloudService.qiniuService.bucketTokens[bucket as string]
   );
+  const currentCrumbs = useSelector((state: any) => state.status.currentCrumbs);
   const beforeUpload = (file: UploadFile, list: UploadFile[]) => {
     setFileList([...fileList, ...list]);
+    const directorys = currentCrumbs.slice(1).join("");
     const fileInfoList = list.map((file: UploadFile) => {
       const id = nanoid();
-      return { id, fileName: file.name };
+      const key = directorys + file.name;
+      return { id, fileName: key };
     });
     setCurrentUploadFile([...currentUploadFile, ...fileInfoList]);
     return false;
-  };
-
-  const handleShowList = () => {
-    console.log("fileList", currentUploadFile);
   };
 
   const handleRemoveFile = (file: any) => {
@@ -46,11 +45,13 @@ const FileUpload: React.FC = () => {
 
   const handleUploadFile = (event: any) => {
     setBeginUpload(true);
+    const directorys = currentCrumbs.slice(1).join("");
     const file = event.file;
-    const key = file.name;
+    const key = directorys + file.name;
     const uploadFile = qiniuManger.uploadFile(file, key, token);
     uploadFile.observer({
       next(res: any) {
+        console.log("next", res);
         let status: FileUploadStatus = "uploading";
         setCurrentUploadFile((currentUploadFile: any) => {
           return currentUploadFile.map((item: any) => {
@@ -59,7 +60,6 @@ const FileUpload: React.FC = () => {
               : item;
           });
         });
-        // console.log("next", res);
       },
       error(err: Error) {
         // console.log("error", err);
@@ -87,7 +87,6 @@ const FileUpload: React.FC = () => {
       <Card>
         <div className="flex justify-between">
           <div className="font-semibold text-[16px]">{t("fileUpload")}</div>
-          {/* <Button onClick={handleShowList}>查看文件列表</Button> */}
         </div>
         <Row className="mt-[16px]">
           <Col span={24}>
