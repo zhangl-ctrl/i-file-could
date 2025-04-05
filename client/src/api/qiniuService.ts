@@ -5,7 +5,7 @@ import { Token } from "./type";
 export const getQiniuToken = (
   accessKey: string,
   secretKey: string,
-  bucket: string
+  bucket: string | Array<string>
 ): Promise<Token> => {
   return http.post("/qiniu/getQiniuToken", {
     accessKey,
@@ -60,8 +60,33 @@ export const deleteQiniuBucket = (
     bucket,
   });
 };
-// 新建文件夹
-// export const createDirectory = (
-//   accessKey: string,
-//   secretKey: string,
-// )
+// 获取文件详情
+export const getQiniuFileDetail = (
+  accessKey: string,
+  secretKey: string,
+  bucket: string,
+  key: string
+) => {
+  return http.post("/qiniu/getFileDetail", {
+    accessKey,
+    secretKey,
+    bucket,
+    key,
+  });
+};
+// 获取文件下载链接
+export const getFileDownloadLink = (
+  accessKey: string,
+  secretKey: string,
+  domain: string,
+  key: string,
+  auth: number
+) => {
+  return http.post("/qiniu/getFileDownloadLink", {
+    accessKey,
+    secretKey,
+    domain,
+    key,
+    auth,
+  });
+};

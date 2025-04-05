@@ -28,8 +28,6 @@ const UploadProgressList: React.FC<{
   currentUploadFile: File[];
   onRemoveFile: (file: any) => void;
 }> = ({ currentUploadFile, onRemoveFile, beginUpload }) => {
-  // console.log("currentUploadFile-----", currentUploadFile);
-
   // 文件上传进度组件是否折叠
   const [fold, setFold] = useState<boolean>(false);
   useEffect(() => {

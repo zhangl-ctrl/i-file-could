@@ -23,13 +23,14 @@ import type { MenuProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { getQiniuFilelist } from "@/api/qiniuService";
+import { getQiniuFilelist, getQiniuFileDetail } from "@/api/qiniuService";
 import formatFileSize from "@/utils/formatFileSize";
 import { STORAGE_TYPE } from "@/common/cloudService";
 import formatDate from "@/utils/formatDate";
 import { updateCrumbs } from "@/store/statusSlice";
 import qiniuManger from "@/utils/qiniuManger";
 import noFileListImg from "@/assets/images/空空如也.svg";
+import FileDetail from "@/components/FileDetail";
 
 type FileInfo = Record<string, string>;
 type Crumbs = {
@@ -120,7 +121,7 @@ const tableColumns = [
 const items: MenuProps["items"] = [
   {
     key: "1",
-    label: "查看",
+    label: "下载",
   },
   {
     key: "2",
@@ -146,23 +147,40 @@ const FileList: React.FC = () => {
   const [directory, setDirectory] = useState<string>("");
   const [directoryStatus, setDirectoryStatus] = useState<NameStatus>("");
   const [createDirLoadding, setCreateDirLoadding] = useState<boolean>(false);
+  const [fileDrawer, setFileDrawer] = useState<boolean>(false);
+  const [priviewFile, setPriviewFile] = useState<Record<string, any>>();
   // 当前存储桶内的文件
   const [currentFileList, setCurrentFileList] = useState<TableFile>();
   // 获取密钥
-  const { accessKey, secretKey } = useSelector(
-    (state: any) => state.cloudService.qiniuService
-  );
+  const {
+    accessKey,
+    secretKey,
+    buckets: bucketsList,
+  } = useSelector((state: any) => state.cloudService.qiniuService);
   const currentCrumbs = useSelector((state: any) => state.status.currentCrumbs);
   const token = useSelector(
     (state: any) =>
       state.cloudService.qiniuService.bucketTokens[bucket as string]
   );
+  // 获取文件列表
+  const handleGetQiniuFilelist = (bucket: string) => {
+    setLoadding(true);
+    getQiniuFilelist(accessKey, secretKey, bucket).then(async (res: any) => {
+      res.files = res.files.map((file: Record<string, any>) => {
+        file.fileName = file.key;
+        return file;
+      });
+      setCurrentFileList(res);
+      setLoadding(false);
+    });
+  };
   // 点击文件夹
   const handlePreviewDirectory = (directory: TableFile) => {
     const pathStr = currentFolder.slice(1).join("") + directory.name;
     directory.files = directory.files.filter((file) => file.key !== pathStr);
     directory.files.forEach((file) => {
-      file.key = file.key.replace(pathStr, "");
+      file.fileName = file.key.replace(pathStr, "");
+      // file.key = file.key.replace(pathStr, "");
     });
     directory.folders.forEach((folderItem) => {
       folderItem.name = folderItem.name.replace(pathStr, "");
@@ -194,11 +212,7 @@ const FileList: React.FC = () => {
   // 刷新文件列表
   const handleRefreshList = () => {
     if (accessKey && secretKey && bucket) {
-      setLoadding(true);
-      getQiniuFilelist(accessKey, secretKey, bucket).then(async (res: any) => {
-        setCurrentFileList(res);
-        setLoadding(false);
-      });
+      handleGetQiniuFilelist(bucket);
     }
   };
   // 点击新建文件夹按钮
@@ -246,17 +260,25 @@ const FileList: React.FC = () => {
     setDirectoryStatus("");
     setDirectory("");
   };
+  // 获取文件详情
+  const getFileDetail = async (file: any) => {
+    setPriviewFile(file);
+    setFileDrawer(true);
+    if (bucket) {
+      const key = file.key;
+      getQiniuFileDetail(accessKey, secretKey, bucket, key);
+    }
+  };
+  // 关闭文件详情
+  const handleCloseFileDetail = () => {
+    setFileDrawer(false);
+  };
   // 获取文件列表
   useEffect(() => {
     if (accessKey && secretKey && bucket) {
-      setLoadding(true);
-      getQiniuFilelist(accessKey, secretKey, bucket).then(async (res: any) => {
-        setCurrentFileList(res);
-        setLoadding(false);
-      });
+      handleGetQiniuFilelist(bucket);
     }
   }, [accessKey, secretKey]);
-
   useEffect(() => {
     // 初始化面包屑根目录，此函数只执行一次
     if (hasFile && currentFileList) {
@@ -346,9 +368,12 @@ const FileList: React.FC = () => {
                       <Row className="h-10 leading-10 px-2 box-border cursor-text hover:bg-[#f8f8f8]">
                         <Col span={8}>
                           <div className="flex items-center">
-                            <FileIcon filename={file.key} isFolder={false} />
+                            <FileIcon
+                              filename={file.fileName}
+                              isFolder={false}
+                            />
                             <div className="overflow-hidden whitespace-nowrap text-ellipsis">
-                              {file.key}
+                              {file.fileName}
                             </div>
                           </div>
                         </Col>
@@ -364,7 +389,10 @@ const FileList: React.FC = () => {
                         </Col>
                         <Col span={2}>
                           <Space>
-                            <span className="text-[#1677ff]">
+                            <span
+                              className="text-[#1677ff] hover:text-[#69b1ff] cursor-pointer"
+                              onClick={() => getFileDetail(file)}
+                            >
                               {t("detail")}
                             </span>
                             <Dropdown menu={{ items }} trigger={["click"]}>
@@ -431,6 +459,14 @@ const FileList: React.FC = () => {
           </Row>
         </Spin>
       </Modal>
+      {priviewFile && bucket && (
+        <FileDetail
+          showDrawer={fileDrawer}
+          onClose={handleCloseFileDetail}
+          file={priviewFile}
+          bucket={bucket}
+        />
+      )}
       {contextHolder}
     </>
   );

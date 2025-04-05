@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { TabsProps } from "antd";
-import { Row, Col, Button, Tabs, Input, Space, Spin, Modal } from "antd";
+import { Row, Col, Button, Tabs, Input, Space, Spin } from "antd";
 import { useTranslation } from "react-i18next";
 import { PlusSquareOutlined, UndoOutlined } from "@ant-design/icons";
 import BucketList from "@/components/BucketManagement/BucketList";
@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getQiniuBuckets } from "@/api/qiniuService";
 import { setQiniuBuckets } from "@/store/cloudServiceSlice";
 import CreateBucketModal from "@/components/BucketManagement/CreateBucketModal";
+// import { getQiniuToken } from "@/api/qiniuService";
 
 const { Search } = Input;
 
@@ -27,6 +28,10 @@ const BucketContainer: React.FC<{
     try {
       setLoadding(true);
       const res = await getQiniuBuckets(accessKey, secretKey);
+      // const bucketNames = res.map((item: any) => item.bucketName);
+      // const tokenList = await getQiniuToken(accessKey, secretKey, bucketNames);
+      // console.log("tokenList", tokenList);
+
       dispatch(setQiniuBuckets(res));
       setBuckets(res);
     } catch (err) {
@@ -44,16 +49,13 @@ const BucketContainer: React.FC<{
       setBucketsToQiniu();
     }
   };
-
   const handleCreateBucket = () => {
     setShowCreateModal(true);
   };
-
   const handleConfirm = async () => {
     setShowCreateModal(false);
     setBucketsToQiniu();
   };
-
   const handleCancel = () => {
     setShowCreateModal(false);
   };

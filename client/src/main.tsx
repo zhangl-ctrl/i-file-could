@@ -1,22 +1,25 @@
+import "./index.css";
+import "dayjs/locale/zh-cn";
+import zhCN from "antd/locale/zh_CN";
+import App from "./App.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "@/store";
-import "./index.css";
 import "@ant-design/v5-patch-for-react-19";
-import zhCN from "antd/locale/zh_CN";
 import { ConfigProvider } from "antd";
-import "dayjs/locale/zh-cn";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./store";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Provider store={store}>
-        <ConfigProvider locale={zhCN}>
-          <App />
-        </ConfigProvider>
+        <PersistGate loading={null} persistor={persistor}>
+          <ConfigProvider locale={zhCN}>
+            <App />
+          </ConfigProvider>
+        </PersistGate>
       </Provider>
     </BrowserRouter>
   </StrictMode>

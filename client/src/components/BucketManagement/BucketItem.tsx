@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Row, Col, Tag, Dropdown, MenuProps, message } from "antd";
 import {
   FundProjectionScreenOutlined,
@@ -15,31 +15,33 @@ import { QINIU_REGION } from "@/common/cloudService";
 import formatDate from "@/utils/formatDate";
 import { deleteQiniuBucket } from "@/api/qiniuService";
 import { useSelector } from "react-redux";
+import BucketSetup from "@/components/BucketManagement/BucketSetup";
 
 type T_Region = keyof typeof QINIU_REGION;
-
-const actions: React.ReactNode[] = [
-  <div>
-    <SettingOutlined key="setting" />
-    <span>{" 管理配置"}</span>
-  </div>,
-  <div>
-    <FundProjectionScreenOutlined key="setting" />
-    <span>{" 监控数据"}</span>
-  </div>,
-];
 
 const BucketItem: React.FC<{
   bucket: CloudStorageInfo;
   onDetele: (status: boolean) => void;
 }> = ({ bucket, onDetele }) => {
   const [messageApi, contextHolder] = message.useMessage();
+  const [showSetup, setShowSetup] = useState<boolean>(false);
   const { accessKey, secretKey } = useSelector(
     (state: any) => state.cloudService.qiniuService
   );
   const navigate = useNavigate();
   const handleNavigateBucket = (bucket: CloudStorageInfo) => {
     navigate(`/file-management/${bucket.cloudService}/${bucket.bucketName}`);
+  };
+  const handleOpenBucketSetup = () => {
+    setShowSetup(true);
+  };
+  const handleCancel = () => {
+    console.log("handleCancel");
+    setShowSetup(false);
+  };
+  const handleOk = () => {
+    console.log("handleOk");
+    setShowSetup(false);
   };
   const handleDeleteBucket = async () => {
     try {
@@ -69,10 +71,21 @@ const BucketItem: React.FC<{
       ),
     },
   ];
+  const actions: React.ReactNode[] = [
+    <div onClick={handleOpenBucketSetup}>
+      <SettingOutlined key="setting" />
+      <span>{" 管理配置"}</span>
+    </div>,
+    <div>
+      <FundProjectionScreenOutlined key="setting" />
+      <span>{" 监控数据"}</span>
+    </div>,
+  ];
 
   return (
     <>
       {contextHolder}
+      <BucketSetup open={showSetup} onClose={handleCancel} onOk={handleOk} />
       <Card actions={actions} style={{ width: 400 }}>
         <Row justify="space-between">
           <Col>
@@ -120,14 +133,6 @@ const BucketItem: React.FC<{
         </Row>
         <Row className="mt-[10px]" justify="space-between">
           <Col>
-            <Text text="区域" />
-          </Col>
-          <Col>
-            <Text text={QINIU_REGION[bucket.region as T_Region]} />
-          </Col>
-        </Row>
-        <Row className="mt-[10px]" justify="space-between">
-          <Col>
             <Text text="权限" />
           </Col>
           <Col>
@@ -140,6 +145,14 @@ const BucketItem: React.FC<{
                 <span className="text-[#fff]">{bucket.auth}</span>
               </Tag>
             )}
+          </Col>
+        </Row>
+        <Row className="mt-[10px]" justify="space-between">
+          <Col>
+            <Text text="区域" />
+          </Col>
+          <Col>
+            <Text text={QINIU_REGION[bucket.region as T_Region]} />
           </Col>
         </Row>
         <Row className="mt-[10px]" justify="space-between">

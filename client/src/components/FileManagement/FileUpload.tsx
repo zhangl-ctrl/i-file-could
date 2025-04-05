@@ -22,7 +22,7 @@ const FileUpload: React.FC = () => {
   const [currentUploadFile, setCurrentUploadFile] = useState<any>([]);
   const token = useSelector(
     (state: any) =>
-      state.cloudService.qiniuService.bucketTokens[bucket as string]
+      state.cloudService.qiniuService.bucketTokens[bucket as string].token
   );
   const currentCrumbs = useSelector((state: any) => state.status.currentCrumbs);
   const beforeUpload = (file: UploadFile, list: UploadFile[]) => {

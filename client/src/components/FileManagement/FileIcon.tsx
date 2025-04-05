@@ -33,6 +33,7 @@ import webp from "@/assets/images/files/webp.png";
 import xls from "@/assets/images/files/xls.png";
 import xlsx from "@/assets/images/files/xlsx.png";
 import zip from "@/assets/images/files/zip.png";
+import defaultImg from "@/assets/images/files/default.png";
 import type { TableFile } from "./FileList";
 
 const iconMap = new Map([
@@ -43,6 +44,7 @@ const iconMap = new Map([
   ["diropen", diropen],
   ["doc", doc],
   ["docx", docx],
+  ["bmp", png],
   ["flac", flac],
   ["gif", gif],
   ["html", html],
@@ -54,6 +56,7 @@ const iconMap = new Map([
   ["mp2", mp2],
   ["mp3", mp3],
   ["mp4", mp4],
+  ["mov", mp4],
   ["ogg", ogg],
   ["ogv", ogv],
   ["pdf", pdf],
@@ -70,6 +73,8 @@ const iconMap = new Map([
   ["xls", xls],
   ["xlsx", xlsx],
   ["zip", zip],
+  ["7z", zip],
+  ["", defaultImg],
 ]);
 
 const FileIcon: React.FC<{
@@ -77,7 +82,13 @@ const FileIcon: React.FC<{
   isFolder: boolean;
   subItem?: TableFile[] | null;
 }> = ({ filename, isFolder, subItem }) => {
-  const extension = filename.split(".").at(-1) || "";
+  let extensionArr: Array<string> = filename.split(".");
+  let extension: string = "";
+  if (extensionArr.length > 1) {
+    extension = filename.split(".").at(-1) || "";
+  } else if (extensionArr.length === 1) {
+    extension = "";
+  }
 
   return isFolder ? (
     subItem && subItem.length > 0 ? (
@@ -95,7 +106,7 @@ const FileIcon: React.FC<{
     )
   ) : (
     <img
-      src={iconMap.get(extension)}
+      src={iconMap.get(extension.toLowerCase())}
       className="w-[20px] h-[20px] mr-[4px]"
       alt="文件"
     />

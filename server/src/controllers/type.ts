@@ -5,3 +5,10 @@ export type fileType = {
   isFolder?: boolean;
   children?: FileChildren[];
 };
+
+export type bucketTokens = {
+  bucket: string;
+  token: string;
+  expires: number;
+  ctime: string | number;
+};

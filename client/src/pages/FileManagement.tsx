@@ -15,15 +15,16 @@ export default function FileManagement() {
   const { bucket, cloud } = useParams();
   const service = useSelector((state: any) => state.cloudService);
   const currentCloud = SERVICE[cloud as keyof typeof SERVICE];
+
   useEffect(() => {
     if (cloud === "qiniu") {
       const {
         qiniuService: { accessKey, secretKey },
       } = service;
-      if (accessKey && secretKey) {
-        getQiniuToken(accessKey, secretKey, bucket as string).then(
+      if (accessKey && secretKey && bucket) {
+        getQiniuToken(accessKey, secretKey, bucket).then(
           (res) => {
-            const token = res.token;
+            const token = res;
             dispatch(setQiniuToken({ bucketName: bucket, token }));
           },
           (err) => {
@@ -33,7 +34,7 @@ export default function FileManagement() {
       }
     } else if (cloud === "tencent") {
     }
-  }, [service]);
+  }, [bucket]);
 
   return (
     <>

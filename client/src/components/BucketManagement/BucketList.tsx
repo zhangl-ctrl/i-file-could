@@ -18,7 +18,11 @@ const BucketList: React.FC<{
         buckets.map((bucket: any, index: number) => {
           return (
             <Fragment key={index}>
-              <BucketItem bucket={bucket} onDetele={handleDelateBucket} />
+              <BucketItem
+                bucket={bucket}
+                onDetele={handleDelateBucket}
+                key={index}
+              />
             </Fragment>
           );
         })
