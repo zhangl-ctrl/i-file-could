@@ -13,10 +13,13 @@
   "type": "commonjs",
   "dependencies": {
     "@types/koa-bodyparser": "^4.3.12",
+    "axios": "^1.8.4",
+    "dayjs": "^1.11.13",
     "koa": "^2.16.0",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^13.0.1",
     "koa2-cors": "^2.0.6",
+    "nanoid": "^5.1.5",
     "qiniu": "^7.14.0"
   },
   "devDependencies": {

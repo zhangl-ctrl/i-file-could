@@ -13,31 +13,30 @@ export default [
     children: [
       {
         path: "/",
-        name: "文件管理",
-        element: <Navigate to="file-management" />,
+        element: <Navigate to="cloud-setup" />,
       },
       {
-        path: "file-management",
-        name: "文件管理",
-        element: <FileManagement />,
+        path: "/cloud-setup",
+        name: "云厂商管理",
+        element: <CloudSetup />,
       },
       {
-        path: "bucket-management",
+        path: "/bucket-management",
         name: "存储桶管理",
         element: <BucketManagement />,
       },
       {
-        path: "cloud-setup",
-        name: "云服务设置",
-        element: <CloudSetup />,
+        path: "/file-management/:cloud/:bucket",
+        name: "文件管理",
+        element: <FileManagement />,
       },
       {
-        path: "data-monitoring",
+        path: "/data-monitoring",
         name: "数据监控",
         element: <DataMonitoring />,
       },
       {
-        path: "operation-log",
+        path: "/operation-log",
         name: "操作日志",
         element: <OperationLog />,
       },

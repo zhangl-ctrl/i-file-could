@@ -3,6 +3,8 @@ import type { Status } from "./type";
 
 const initialState: Status = {
   collapsed: false,
+  language: "",
+  currentCrumbs: [],
 };
 
 const statusSlice = createSlice({
@@ -12,8 +14,19 @@ const statusSlice = createSlice({
     updateCollapse: (state) => {
       state.collapsed = !state.collapsed;
     },
+    switchLanguage: (state, action) => {
+      console.log("state", state);
+      console.log("action", action);
+    },
+    updateCrumbs: (state, action) => {
+      // console.log("state", state);
+      // console.log("action", action);
+      const { payload } = action;
+      state.currentCrumbs = payload;
+    },
   },
 });
 
-export const { updateCollapse } = statusSlice.actions;
+export const { updateCollapse, switchLanguage, updateCrumbs } =
+  statusSlice.actions;
 export default statusSlice.reducer;

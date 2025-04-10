@@ -1,0 +1,23 @@
+{
+  "fileUpload": "文件上传",
+  "fileList": "文件列表",
+  "checkOrDragFileToUpload": "点击或拖拽文件到此处上传",
+  "SupportTypeOfFile": "支持任意类型文件，单个文件最大 500 MB",
+  "uploadFile": "上传文件",
+  "detail": "详情",
+  "more": "更多",
+  "fileManagement": "文件管理",
+  "bucketManagement": "存储桶管理",
+  "operationLog": "操作日志",
+  "dataMonitoring": "数据监控",
+  "cloudVendorManagement": "云厂商管理",
+  "enterFileName": "请输入文件名",
+  "createFolder": "新建文件夹",
+  "fileName": "文件名",
+  "fileSize": "文件大小",
+  "fileType": "文件类型",
+  "storageType": "存储类型",
+  "lastUpdated": "最近更新",
+  "operation": "操作",
+  "createBucket": "创建存储桶"
+}

@@ -1,62 +1,70 @@
-import { Menu, Layout, theme } from "antd";
+import React, { useEffect, useState } from "react";
+import { Menu, Layout, theme, Skeleton } from "antd";
+import type { MenuProps } from "antd";
 import {
   BarChartOutlined,
-  CloudServerOutlined,
   DatabaseOutlined,
   FileTextOutlined,
   FundViewOutlined,
+  CloudServerOutlined,
 } from "@ant-design/icons";
-import React from "react";
 import Logo from "@/components/Logo";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import type { MenuProps } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
+
+const Text: React.FC<{ text: string }> = ({ text }) => {
+  const { t } = useTranslation("common");
+  return <>{t(text)}</>;
+};
 
 const menu = [
   {
     key: "1",
-    icon: <FileTextOutlined />,
-    label: "文件管理",
-    path: "file-management",
+    icon: <CloudServerOutlined />,
+    label: <Text text="cloudVendorManagement" />,
+    path: "cloud-setup",
   },
   {
     key: "2",
     icon: <DatabaseOutlined />,
-    label: "存储桶管理",
+    label: <Text text="bucketManagement" />,
     path: "bucket-management",
   },
   {
     key: "3",
-    icon: <CloudServerOutlined />,
-    label: "云服务存储",
-    path: "cloud-setup",
-  },
-  {
-    key: "4",
     icon: <BarChartOutlined />,
-    label: "数据监控",
+    label: <Text text="dataMonitoring" />,
     path: "data-monitoring",
   },
   {
-    key: "5",
+    key: "4",
     icon: <FundViewOutlined />,
-    label: "操作日志",
+    label: <Text text="operationLog" />,
     path: "operation-log",
   },
 ];
 
 const routerMap = new Map<string, string>([
-  ["1", "file-management"],
+  ["1", "cloud-setup"],
   ["2", "bucket-management"],
-  ["3", "cloud-setup"],
-  ["4", "data-monitoring"],
-  ["5", "operation-log"],
+  ["3", "data-monitoring"],
+  ["4", "operation-log"],
+]);
+
+const updateLocationMap = new Map<string, string>([
+  ["cloud-setup", "1"],
+  ["bucket-management", "2"],
+  ["file-management", "2"],
+  ["data-monitoring", "3"],
+  ["operation-log", "4"],
 ]);
 
 const CloudSider: React.FC = () => {
+  const [defaultPath, setDefault] = useState<string>();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -66,24 +74,41 @@ const CloudSider: React.FC = () => {
     const path = routerMap.get(e.key) || "";
     navigate(path);
   };
+  const location = useLocation();
+  useEffect(() => {
+    console.log("90909");
+
+    const pathname = location.pathname;
+    for (const key of updateLocationMap.keys()) {
+      if (pathname.includes(key)) {
+        setDefault(updateLocationMap.get(key));
+        break;
+      }
+    }
+  }, [location]);
 
   return (
     <Sider
+      width={260}
       trigger={null}
       collapsible
       collapsed={collapsed}
       style={{ background: colorBgContainer }}
     >
-      {/* <div style={{ display: "flex", justifyContent: "center" }}> */}
       <div className="flex justify-center">
         <Logo />
       </div>
-      <Menu
-        mode="inline"
-        defaultSelectedKeys={["1"]}
-        items={menu}
-        onClick={handleClick}
-      ></Menu>
+      {defaultPath && (
+        <Menu
+          style={{
+            fontSize: "16px",
+          }}
+          mode="inline"
+          defaultSelectedKeys={[defaultPath]}
+          items={menu}
+          onClick={handleClick}
+        ></Menu>
+      )}
     </Sider>
   );
 };
