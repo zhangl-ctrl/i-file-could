@@ -28,6 +28,14 @@ const CloudSetup: React.FC = () => {
     localStorage.setItem("qiniuKey", JSON.stringify(qiniuKey));
     setIsProofModalOpen(false);
     messageApi.success("更新凭证成功");
+    // 日志记录
+    // qiniuLogger.addLogger({
+    //   eventName: "更新访问凭证",
+    //   status: "success",
+    //   infoType: "info",
+    //   path: location.pathname,
+    //   detail: "成功设置访问凭证",
+    // });
   };
   const handlepProofCancel = () => {
     setIsProofModalOpen(false);

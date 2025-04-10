@@ -1,9 +1,17 @@
 import Koa from "koa";
 import qiniu from "qiniu";
-import { bucketTokens } from "./type";
 import { nanoid } from "nanoid";
 import errorHttpCode from "../common/errorHttpCode";
-import getBucketManager from "../utils/getBucketManager";
+import axios from "axios";
+import dayjs from "dayjs";
+import {
+  getCdnFlow,
+  getTodaySpaceAmount,
+  getSpaceFileAmount,
+  getGetRequestAmount,
+  getPutRequestAmount,
+  getSpaceOutFlow,
+} from "../api/qiniuServiceApi";
 
 const default_expires = 3600;
 /**
@@ -100,16 +108,20 @@ const qiniuController = {
           return 0;
         }
       });
-
       ctx.body = {
         code: 200,
-        message: "请求成功",
+        message: "成功获取存储桶列表",
         success: true,
         data: buckets,
       };
-    } catch (err) {
+    } catch (err: any) {
       ctx.status = 500;
-      ctx.body = { error: err };
+      ctx.body = {
+        code: 500,
+        message: err.message,
+        success: false,
+        data: null,
+      };
     }
   },
   // 根据存储桶获取文件列表
@@ -267,6 +279,114 @@ const qiniuController = {
         message: "请求成功",
         success: true,
         data: privateUrl,
+      };
+    }
+  },
+  // 获取存储桶空间使用量数据
+  async getSpaceOverview(ctx: Koa.Context) {
+    const { accessKey, secretKey } = ctx.request.body as Record<string, any>;
+    const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+    const requestUrl =
+      "https://uc.qiniuapi.com/v3/buckets?line=false&product=kodo&shared=true";
+    const accessToken = qiniu.util.generateAccessToken(mac, requestUrl);
+    const xQiniuDate =
+      new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    try {
+      const res = await axios.get(requestUrl, {
+        headers: {
+          Authorization: accessToken,
+          "X-Qiniu-Date": xQiniuDate,
+        },
+      });
+      ctx.body = {
+        code: 200,
+        success: true,
+        message: "成功获取存储桶空间使用量数据",
+        data: res.data,
+      };
+    } catch (err: any) {
+      ctx.body = {
+        code: err.status,
+        success: false,
+        message: "获取存储桶空间使用量数据失败",
+        data: null,
+      };
+    }
+  },
+  // 获取使用趋势
+  async getSpaceTendency(ctx: Koa.Context) {
+    const { accessKey, secretKey, begin, end } = ctx.request.body as Record<
+      string,
+      any
+    >;
+    const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+    const requestUrl = `http://api.qiniuapi.com/v6/space?begin=${begin}&end=${end}&g=day&disable_ctime=true&product=kodo&fogRegionsEnable=true`;
+    const accessToken = qiniu.util.generateAccessToken(mac, requestUrl);
+    const xQiniuDate =
+      new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    try {
+      const res = await axios.get(requestUrl, {
+        headers: {
+          Authorization: accessToken,
+          "X-Qiniu-Date": xQiniuDate,
+        },
+      });
+      ctx.body = {
+        code: 200,
+        success: true,
+        message: "成功获取存储量趋势",
+        data: res.data,
+      };
+    } catch (err: any) {
+      ctx.body = {
+        code: err.status,
+        success: false,
+        message: "获取存储量趋势失败",
+        data: null,
+      };
+    }
+  },
+  // 获取标准存储今日空间存储量
+  async getTodaySpaceAmount(ctx: Koa.Context) {
+    const { accessKey, secretKey } = ctx.request.body as Record<string, any>;
+    const response: Record<string, any> = {};
+    try {
+      const res1 = await getCdnFlow(accessKey, secretKey);
+      const res2 = await getTodaySpaceAmount(accessKey, secretKey);
+      const res3 = await getSpaceFileAmount(accessKey, secretKey);
+      const res4 = await getGetRequestAmount(accessKey, secretKey);
+      const res5 = await getPutRequestAmount(accessKey, secretKey);
+      const res6 = await getSpaceOutFlow(accessKey, secretKey);
+      response.cdnFlow = res1.data.reduce(
+        (pre: any, cur: any) => pre + cur.values.flow,
+        0
+      );
+      response.todaySpaceAmount = res2.data.datas[0];
+      response.spaceFileAmount = res3.data.datas[0];
+      response.getRequestAmount = res4.data.reduce(
+        (pre: any, cur: any) => pre + cur.values.hits,
+        0
+      );
+      response.putRequestAmount = res5.data.reduce(
+        (pre: any, cur: any) => pre + cur.values.hits,
+        0
+      );
+      response.spaceOutFlow = res6.data.reduce(
+        (pre: any, cur: any) => pre + cur.values.flow,
+        0
+      );
+      ctx.body = {
+        code: 200,
+        success: true,
+        message: "获取空间存储桶概览数据成功",
+        data: response,
+      };
+    } catch (err: any) {
+      ctx.body = {
+        code: err.status,
+        success: false,
+        message: err.message,
+        data: null,
       };
     }
   },

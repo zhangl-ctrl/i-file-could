@@ -17,9 +17,9 @@ const FileDetail: React.FC<{
 }> = ({ bucket, showDrawer, file, onClose }) => {
   const [fileLink, setFileLink] = useState("");
   const {
-    buckets: bucketList,
     accessKey,
     secretKey,
+    buckets: bucketList,
   } = useSelector((state: any) => state.cloudService.qiniuService);
   const currentBucket = bucketList.find(
     (item: any) => item.bucketName === bucket
@@ -32,15 +32,15 @@ const FileDetail: React.FC<{
         const { key } = file;
         const { privateAuth } = currentBucket;
         if (Array.isArray(domains) && domains.length > 0) {
-          const fileLink = await getFileDownloadLink(
+          const res = await getFileDownloadLink(
             accessKey,
             secretKey,
             domains[0].domain,
             key,
             privateAuth
           );
-          setFileLink(fileLink);
-          file.fileLink = fileLink;
+          setFileLink(res.data);
+          file.fileLink = res.data;
         } else {
           setFileLink("--");
           file.fileLink = "--";

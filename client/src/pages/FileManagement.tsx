@@ -23,8 +23,9 @@ export default function FileManagement() {
       } = service;
       if (accessKey && secretKey && bucket) {
         getQiniuToken(accessKey, secretKey, bucket).then(
-          (res) => {
-            const token = res;
+          (res: any) => {
+            const token = res.data;
+
             dispatch(setQiniuToken({ bucketName: bucket, token }));
           },
           (err) => {

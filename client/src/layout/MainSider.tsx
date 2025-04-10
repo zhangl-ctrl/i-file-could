@@ -1,5 +1,5 @@
-import React from "react";
-import { Menu, Layout, theme } from "antd";
+import React, { useEffect, useState } from "react";
+import { Menu, Layout, theme, Skeleton } from "antd";
 import type { MenuProps } from "antd";
 import {
   BarChartOutlined,
@@ -11,7 +11,7 @@ import {
 import Logo from "@/components/Logo";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
@@ -55,7 +55,16 @@ const routerMap = new Map<string, string>([
   ["4", "operation-log"],
 ]);
 
+const updateLocationMap = new Map<string, string>([
+  ["cloud-setup", "1"],
+  ["bucket-management", "2"],
+  ["file-management", "2"],
+  ["data-monitoring", "3"],
+  ["operation-log", "4"],
+]);
+
 const CloudSider: React.FC = () => {
+  const [defaultPath, setDefault] = useState<string>();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -65,6 +74,18 @@ const CloudSider: React.FC = () => {
     const path = routerMap.get(e.key) || "";
     navigate(path);
   };
+  const location = useLocation();
+  useEffect(() => {
+    console.log("90909");
+
+    const pathname = location.pathname;
+    for (const key of updateLocationMap.keys()) {
+      if (pathname.includes(key)) {
+        setDefault(updateLocationMap.get(key));
+        break;
+      }
+    }
+  }, [location]);
 
   return (
     <Sider
@@ -77,15 +98,17 @@ const CloudSider: React.FC = () => {
       <div className="flex justify-center">
         <Logo />
       </div>
-      <Menu
-        style={{
-          fontSize: "16px",
-        }}
-        mode="inline"
-        defaultSelectedKeys={["1"]}
-        items={menu}
-        onClick={handleClick}
-      ></Menu>
+      {defaultPath && (
+        <Menu
+          style={{
+            fontSize: "16px",
+          }}
+          mode="inline"
+          defaultSelectedKeys={[defaultPath]}
+          items={menu}
+          onClick={handleClick}
+        ></Menu>
+      )}
     </Sider>
   );
 };

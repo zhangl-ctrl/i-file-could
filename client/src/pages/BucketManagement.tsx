@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { TabsProps } from "antd";
 import { Row, Col, Button, Tabs, Input, Space, Spin } from "antd";
 import { useTranslation } from "react-i18next";
@@ -8,13 +8,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { getQiniuBuckets } from "@/api/qiniuService";
 import { setQiniuBuckets } from "@/store/cloudServiceSlice";
 import CreateBucketModal from "@/components/BucketManagement/CreateBucketModal";
-// import { getQiniuToken } from "@/api/qiniuService";
 
 const { Search } = Input;
 
 const BucketContainer: React.FC<{
   type: string;
 }> = ({ type }) => {
+  const isInitialRender = useRef(true);
   const dispatch = useDispatch();
   const [loadding, setLoadding] = useState<boolean>(false);
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
@@ -28,18 +28,41 @@ const BucketContainer: React.FC<{
     try {
       setLoadding(true);
       const res = await getQiniuBuckets(accessKey, secretKey);
-      // const bucketNames = res.map((item: any) => item.bucketName);
-      // const tokenList = await getQiniuToken(accessKey, secretKey, bucketNames);
-      // console.log("tokenList", tokenList);
-
-      dispatch(setQiniuBuckets(res));
-      setBuckets(res);
-    } catch (err) {
-      console.error(err);
+      dispatch(setQiniuBuckets(res.data));
+      setBuckets(res.data);
+    } catch (err: any) {
+      console.log("err", err);
     } finally {
       setLoadding(false);
     }
   }
+
+  // const setBucketsToQiniu = useCallback(async () => {
+  //   try {
+  //     setLoadding(true);
+  //     const res = await getQiniuBuckets(accessKey, secretKey);
+  //     console.log("====", res);
+  //     dispatch(setQiniuBuckets(res));
+  //     setBuckets(res);
+  //     qiniuLogger.addLogger({
+  //       eventName: "获取存储桶列表",
+  //       status: "success",
+  //       infoType: "network",
+  //       path: location.pathname,
+  //     });
+  //   } catch (err: any) {
+  //     qiniuLogger.addLogger({
+  //       eventName: "获取存储桶列表",
+  //       status: "error",
+  //       infoType: "network",
+  //       path: location.pathname,
+  //       errorMsg: err.stack,
+  //     });
+  //   } finally {
+  //     setLoadding(false);
+  //   }
+  // }, []);
+
   // 获取腾讯云的存储桶列表
   async function setBucketsToTencent() {}
 
@@ -62,13 +85,14 @@ const BucketContainer: React.FC<{
 
   useEffect(() => {
     if (type === "qiniu") {
-      if (accessKey && secretKey) {
+      if (isInitialRender.current) {
+        isInitialRender.current = false;
         setBucketsToQiniu();
       }
     } else if (type === "tencent") {
       setBucketsToTencent();
     }
-  }, [accessKey, secretKey]);
+  }, []);
 
   return (
     <>

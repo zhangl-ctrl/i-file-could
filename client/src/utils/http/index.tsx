@@ -6,13 +6,14 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { ApiResponse, HttpClientConfig } from "./type";
+import qiniuLogger from "@/utils/Logger/QiniuLogger";
 
 class Http {
   private instance: AxiosInstance;
-  private readonly config: HttpClientConfig;
+  // private readonly config: HttpClientConfig;
 
   constructor(config: HttpClientConfig = {}) {
-    this.config = config;
+    // this.config = config;
     this.instance = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 10000,
@@ -30,7 +31,7 @@ class Http {
       (error: AxiosError) => this.handleRequestError(error)
     );
     this.instance.interceptors.response.use(
-      (response: AxiosResponse) => this.handleResponse(response),
+      (response: AxiosResponse): any => this.handleResponse(response),
       (error: AxiosError) => this.handleResponseError(error)
     );
   }
@@ -45,7 +46,6 @@ class Http {
     if (config.data instanceof FormData) {
       config.headers["Content-Type"] = "multipart/form-data";
     }
-
     return config;
   }
 
@@ -55,17 +55,57 @@ class Http {
   }
 
   private handleResponse<T>(response: AxiosResponse<ApiResponse<T>>) {
-    const res = response.data;
-    if (res.code === 200) {
-      return res.data;
-    } else {
-      return Promise.reject(
-        new Error(response.data.message || "Request failed")
-      );
-    }
+    // 日志记录
+    const method = response.config.method?.toUpperCase();
+    const eventName = decodeURIComponent(response.config.headers.event);
+    const url = response.request.responseURL;
+    const message = response?.data?.message;
+    const statusCode = response.status;
+    const status = statusCode === 200 ? "success" : "error";
+    qiniuLogger.addLogger({
+      method,
+      eventName,
+      url,
+      status,
+      statusCode,
+      message,
+      infoType: "network",
+    });
+    return response.data;
   }
 
   private handleResponseError(error: AxiosError) {
+    if (error && error.config) {
+      const method = error.config.method;
+      const eventName = decodeURIComponent(error.config.headers.event);
+      const url = error.request.responseURL;
+      const statusCode = error.status;
+      const message = error.message;
+      const errorMsg: Record<string, any> = error?.response?.data || {};
+      const stack = error.stack;
+      const res = {
+        method,
+        eventName,
+        url,
+        statusCode,
+        message,
+        errorMsg,
+        stack,
+        status: "error",
+        infoType: "network",
+      };
+      qiniuLogger.addLogger({
+        method,
+        eventName,
+        url,
+        statusCode,
+        message,
+        errorMsg,
+        stack,
+        status: "error",
+        infoType: "network",
+      });
+    }
     if (error.response) {
       const status = error.response.status;
       let message = "";

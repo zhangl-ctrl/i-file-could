@@ -11,5 +11,8 @@ router.post("/qiniu/deleteBucket", qiniuController.deleteBucket);
 router.post("/qiniu/getFileDetail", qiniuController.getFileDetail);
 router.post("/qiniu/getDomainsByBucket", qiniuController.getDomainsByBucket);
 router.post("/qiniu/getFileDownloadLink", qiniuController.getFileDownloadLink);
+router.post("/qiniu/getSpaceOverview", qiniuController.getSpaceOverview);
+router.post("/qiniu/getSpaceTendency", qiniuController.getSpaceTendency);
+router.post("/qiniu/getTodaySpaceAmount", qiniuController.getTodaySpaceAmount);
 
 export default router;

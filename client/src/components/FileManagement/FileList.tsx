@@ -152,25 +152,24 @@ const FileList: React.FC = () => {
   // 当前存储桶内的文件
   const [currentFileList, setCurrentFileList] = useState<TableFile>();
   // 获取密钥
-  const {
-    accessKey,
-    secretKey,
-    buckets: bucketsList,
-  } = useSelector((state: any) => state.cloudService.qiniuService);
+  const { accessKey, secretKey } = useSelector(
+    (state: any) => state.cloudService.qiniuService
+  );
   const currentCrumbs = useSelector((state: any) => state.status.currentCrumbs);
   const token = useSelector(
     (state: any) =>
-      state.cloudService.qiniuService.bucketTokens[bucket as string]
+      state.cloudService.qiniuService.bucketTokens[bucket as string]?.token
   );
+
   // 获取文件列表
   const handleGetQiniuFilelist = (bucket: string) => {
     setLoadding(true);
     getQiniuFilelist(accessKey, secretKey, bucket).then(async (res: any) => {
-      res.files = res.files.map((file: Record<string, any>) => {
+      res.data.files = res.data.files.map((file: Record<string, any>) => {
         file.fileName = file.key;
         return file;
       });
-      setCurrentFileList(res);
+      setCurrentFileList(res.data);
       setLoadding(false);
     });
   };
@@ -264,10 +263,10 @@ const FileList: React.FC = () => {
   const getFileDetail = async (file: any) => {
     setPriviewFile(file);
     setFileDrawer(true);
-    if (bucket) {
-      const key = file.key;
-      getQiniuFileDetail(accessKey, secretKey, bucket, key);
-    }
+    // if (bucket) {
+    //   const key = file.key;
+    //   getQiniuFileDetail(accessKey, secretKey, bucket, key);
+    // }
   };
   // 关闭文件详情
   const handleCloseFileDetail = () => {

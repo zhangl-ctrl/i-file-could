@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
 import { Image } from "antd";
-import "@cyntler/react-doc-viewer/dist/index.css";
+import React, { useEffect } from "react";
 import noImg from "@/assets/images/图片损坏.svg";
+import "@cyntler/react-doc-viewer/dist/index.css";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 
 const imgType = [
@@ -23,7 +23,6 @@ const FilePreview: React.FC<{ filePath: string; fileType: string }> = ({
 }) => {
   useEffect(() => {
     if (fileType !== "application/pdf") {
-      console.log("==========");
       import("./index.css");
     }
   }, [filePath]);
@@ -55,6 +54,7 @@ const FilePreview: React.FC<{ filePath: string; fileType: string }> = ({
       </div>
     );
   }
+
   return (
     <DocViewer
       documents={[{ uri: filePath }]}

@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@layer utilities {
+  .card-calc {
+    height: calc(100vh - 138px);
+  }
+}
 
 body {
   padding: 0;
