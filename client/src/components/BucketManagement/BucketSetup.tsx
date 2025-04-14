@@ -1,17 +1,6 @@
 import React from "react";
 import { CloseOutlined } from "@ant-design/icons";
-import {
-  Modal,
-  Row,
-  Col,
-  Input,
-  Radio,
-  Drawer,
-  Button,
-  Table,
-  Space,
-  Tag,
-} from "antd";
+import { Row, Col, Drawer, Button, Table, Tag } from "antd";
 import type { TableProps } from "antd";
 
 interface DataType {
@@ -41,16 +30,16 @@ const columns: TableProps<DataType>["columns"] = [
       return <Tag color="green">启用</Tag>;
     },
   },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>设为默认</a>
-        <a>解绑</a>
-      </Space>
-    ),
-  },
+  // {
+  //   title: "Action",
+  //   key: "action",
+  //   render: (_, record: any) => (
+  //     <Space size="middle">
+  //       <a>设为默认</a>
+  //       <a>解绑</a>
+  //     </Space>
+  //   ),
+  // },
 ];
 
 const data: DataType[] = [
@@ -70,7 +59,7 @@ const BucketSetup: React.FC<{
   open: boolean;
   onClose: () => void;
   onOk: () => void;
-}> = ({ open, onClose, onOk }) => {
+}> = ({ open, onClose }) => {
   // const handleClick = () => {
   //   console.log("0000");
   // };

@@ -1,4 +1,4 @@
-import { Flex, Empty } from "antd";
+import { Flex } from "antd";
 import BucketItem from "./BucketItem";
 import React, { Fragment } from "react";
 import noBucketImg from "@/assets/images/空空如也.svg";

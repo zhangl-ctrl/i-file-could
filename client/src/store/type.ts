@@ -4,10 +4,10 @@ export type Status = {
   currentCrumbs: string[];
 };
 
-type BucketTokens = {
-  token: string;
-  express: string | number;
-};
+// type BucketTokens = {
+//   token: string;
+//   express: string | number;
+// };
 
 export type QiniuService = {
   accessKey: string;

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Menu, Layout, theme, Skeleton } from "antd";
+import { Menu, Layout, theme } from "antd";
 import type { MenuProps } from "antd";
 import {
   BarChartOutlined,
   DatabaseOutlined,
-  FileTextOutlined,
   FundViewOutlined,
   CloudServerOutlined,
 } from "@ant-design/icons";
@@ -76,8 +75,6 @@ const CloudSider: React.FC = () => {
   };
   const location = useLocation();
   useEffect(() => {
-    console.log("90909");
-
     const pathname = location.pathname;
     for (const key of updateLocationMap.keys()) {
       if (pathname.includes(key)) {

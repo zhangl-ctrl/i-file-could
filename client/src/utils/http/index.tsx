@@ -83,17 +83,6 @@ class Http {
       const message = error.message;
       const errorMsg: Record<string, any> = error?.response?.data || {};
       const stack = error.stack;
-      const res = {
-        method,
-        eventName,
-        url,
-        statusCode,
-        message,
-        errorMsg,
-        stack,
-        status: "error",
-        infoType: "network",
-      };
       qiniuLogger.addLogger({
         method,
         eventName,
@@ -130,6 +119,7 @@ class Http {
           message = `网络错误（${status}）`;
       }
       console.error(`[HTTP Error] ${message}`);
+      error.message = message;
     } else if (error.request) {
       console.error("Network Error:" + error.message);
     } else {

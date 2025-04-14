@@ -2,7 +2,6 @@
 import { nanoid } from "nanoid";
 import { DataType } from "./type";
 import formatDate from "@/utils/formatDate";
-import { useLocation } from "react-router-dom";
 
 class QiniuLogger {
   qiniuRequest: any;
@@ -82,7 +81,7 @@ class QiniuLogger {
     });
   }
   // 获取记录
-  async getLogger(config = {}): Promise<DataType[]> {
+  async getLogger(): Promise<DataType[]> {
     const transaction = this.db.transaction(["qiniu_logger"], "readonly");
     const objectStore = transaction.objectStore("qiniu_logger");
     const getAllRequest = objectStore.getAll();

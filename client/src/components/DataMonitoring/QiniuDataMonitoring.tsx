@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card, Row, Col, Segmented, Spin, Divider } from "antd";
-import VChart from "@visactor/vchart";
-import { nanoid } from "nanoid";
 import { useSelector } from "react-redux";
 import { QINIU_REGION } from "@/common/cloudService";
 import formatFileSize from "@/utils/formatFileSize";
@@ -13,6 +11,9 @@ import {
   getTodaySpaceOverView,
 } from "@/api/qiniuService";
 import dayjs from "dayjs";
+import * as echarts from "echarts";
+
+type EChartsOption = echarts.EChartsOption;
 
 const QiniuDataMonitoring: React.FC = () => {
   const [loadding1, setLoadding1] = useState(false);
@@ -29,42 +30,48 @@ const QiniuDataMonitoring: React.FC = () => {
   );
 
   // 七牛云存储空间分布-----------------------------------------------------------------
-  function getSpaceDistributionData(data: any) {
+  function getSpaceDistributionData(data: any): EChartsOption {
     return {
-      type: "pie",
-      data: [
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {
+        top: "50%",
+        left: "left",
+        orient: "vertical",
+      },
+      title: {
+        text: "七牛云存储空间分布",
+        left: "left",
+      },
+      series: [
         {
-          id: nanoid(),
-          values: data,
+          name: "存储区域",
+          type: "pie",
+          radius: ["40%", "70%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: "#fff",
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+            position: "center",
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: "1rem",
+              fontWeight: "bold",
+            },
+          },
+          labelLine: {
+            show: false,
+          },
+          data,
         },
       ],
-      outerRadius: 0.8,
-      innerRadius: 0.5,
-      valueField: "value",
-      categoryField: "type",
-      title: {
-        visible: true,
-        text: "七牛云存储空间分布",
-      },
-      legends: {
-        visible: true,
-        orient: "right",
-      },
-      pie: {
-        style: {
-          cornerRadius: 3,
-        },
-        state: {
-          hover: {
-            outerRadius: 0.85,
-            lineWidth: 1,
-          },
-          selected: {
-            outerRadius: 0.85,
-            lineWidth: 1,
-          },
-        },
-      },
     };
   }
   useEffect(() => {
@@ -78,7 +85,7 @@ const QiniuDataMonitoring: React.FC = () => {
           if (!dataMap.has(item.region)) {
             const spaceInfo = {
               value: 1,
-              type: QINIU_REGION[item.region],
+              name: QINIU_REGION[item.region],
             };
             dataMap.set(item.region, spaceInfo);
           } else {
@@ -93,12 +100,11 @@ const QiniuDataMonitoring: React.FC = () => {
         for (const value of dataMap.values()) {
           formatDataArr.push(value);
         }
-        const spec = getSpaceDistributionData(formatDataArr);
         if (isMounted) {
-          const vchart: VChart | null = new VChart(spec, {
-            dom: spaceDistributionCartRef.current,
-          });
-          vchart.renderSync();
+          let option: EChartsOption = getSpaceDistributionData(formatDataArr);
+          const chartDom = spaceDistributionCartRef.current!;
+          const myChart = echarts.init(chartDom);
+          option && myChart.setOption(option);
         }
       } catch (err: any) {
         console.error("Error:", err.message);
@@ -114,53 +120,61 @@ const QiniuDataMonitoring: React.FC = () => {
   // ----------------------------------------------------------------------------------
 
   // 空间使用量-------------------------------------------------------------------------
-  function getSpaceAmountData(data: any) {
+  function getSpaceAmountData(data: Record<string, any>[]): EChartsOption {
+    const x: string[] = [];
+    const y: number[] = [];
+    data.forEach((item: any) => {
+      x.push(item.bucket);
+      y.push(item.amount);
+    });
     return {
-      type: "bar",
       title: {
-        visible: true,
-        text: "空间用量 TOP5",
+        text: "空间使用量 TOP5",
+        left: "left",
       },
-      data: [
-        {
-          id: "barData",
-          values: data,
-        },
-      ],
-      xField: "bucket",
-      yField: "amount",
-      axes: [
-        {
-          orient: "left",
-          label: {
-            formatMethod: (val: any) => {
-              return val / 1000000 + " MB";
-            },
-          },
-        },
-      ],
       tooltip: {
-        // 配置 mark 图元的内容
-        mark: {
-          content: {
-            key: "存储量",
-            value: (datum: any) => {
-              return formatFileSize(datum.amount);
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "3%",
+        containLabel: true,
+      },
+      xAxis: [
+        {
+          type: "category",
+          data: x,
+          axisTick: {
+            alignWithLabel: true,
+          },
+        },
+      ],
+      yAxis: [
+        {
+          type: "value",
+          position: "left",
+          axisLabel: {
+            formatter: (value) => {
+              return formatFileSize(value);
             },
           },
         },
-        // 配置 dimension 维度项的内容
-        dimension: {
-          content: {
-            key: () => "存储量",
-            value: (datum: any) => formatFileSize(datum.amount),
-          },
+      ],
+      series: [
+        {
+          name: "Direct",
+          type: "bar",
+          barWidth: "60%",
+          data: y,
         },
-      },
+      ],
     };
   }
   useEffect(() => {
-    let vchart: VChart | null = null;
     let isMounted = true;
     const fetchData = async () => {
       try {
@@ -183,12 +197,11 @@ const QiniuDataMonitoring: React.FC = () => {
             amount: item.storage_size,
           };
         });
-        const spec = getSpaceAmountData(formatData);
         if (isMounted) {
-          vchart = new VChart(spec, {
-            dom: spaceAmountRef.current!,
-          });
-          vchart.renderSync();
+          var chartDom = spaceAmountRef.current!;
+          var myChart = echarts.init(chartDom);
+          var option: EChartsOption = getSpaceAmountData(formatData);
+          option && myChart.setOption(option);
         }
       } catch (err: any) {
         console.error("Error:", err.message);
@@ -204,19 +217,48 @@ const QiniuDataMonitoring: React.FC = () => {
   // ----------------------------------------------------------------------------------
 
   // 使用趋势---------------------------------------------------------------------------
-  function getSpaceTendencyData(data: any) {
+  function getSpaceTendencyData(
+    data: { time: string; data: number }[]
+  ): EChartsOption {
+    const x: string[] = [];
+    const y: number[] = [];
+    data.forEach((item: { time: string; data: number }) => {
+      x.push(item.time);
+      y.push(item.data);
+    });
+
     return {
-      type: "area",
-      data: {
-        values: data,
+      xAxis: {
+        type: "category",
+        boundaryGap: false,
+        data: x,
       },
-      xField: "time",
-      yField: "data",
+      yAxis: {
+        type: "value",
+        axisLabel: {
+          formatter: (value) => {
+            const size = formatFileSize(value);
+            if (parseInt(size) === 0) {
+              return "";
+            } else {
+              return size;
+            }
+          },
+        },
+      },
+      series: [
+        {
+          data: y,
+          type: "line",
+          areaStyle: {},
+        },
+      ],
     };
   }
   useEffect(() => {
-    let vchart: VChart | null = null;
     let isMounted = true;
+    let chartDom = null;
+    let myChart: echarts.ECharts | null = null;
     const fetchData = async () => {
       const end = dayjs().format("YYYYMMDD") + "235959";
       const begin =
@@ -238,12 +280,11 @@ const QiniuDataMonitoring: React.FC = () => {
             data: datas[index],
           };
         });
-        const spec = getSpaceTendencyData(data);
         if (isMounted) {
-          vchart = new VChart(spec, {
-            dom: tendencyRef.current!,
-          });
-          vchart.renderSync();
+          chartDom = tendencyRef.current!;
+          myChart = echarts.init(chartDom);
+          const option: EChartsOption = getSpaceTendencyData(data);
+          option && myChart.setOption(option);
         }
       } catch (err: any) {
         console.error("Effor", err.message);
@@ -254,8 +295,9 @@ const QiniuDataMonitoring: React.FC = () => {
     fetchData();
     return () => {
       isMounted = false;
-      if (vchart) {
-        vchart.release();
+      if (myChart) {
+        myChart.dispose();
+        myChart = null;
       }
     };
   }, [daysRange]);
@@ -266,7 +308,6 @@ const QiniuDataMonitoring: React.FC = () => {
       try {
         setLoadding4(true);
         const res = await getTodaySpaceOverView(accessKey, secretKey);
-        console.log("res", res);
         if (res.success) {
           setSpaceOverview(res.data);
         }

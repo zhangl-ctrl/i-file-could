@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Drawer, Row, Col, Image, Button } from "antd";
+import { Drawer, Row, Col } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { STORAGE_TYPE } from "@/common/cloudService";
 import formatDate from "@/utils/formatDate";

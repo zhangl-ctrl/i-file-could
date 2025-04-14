@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { TabsProps } from "antd";
-import { Row, Col, Button, Tabs, Input, Space, Spin } from "antd";
+import { Row, Col, Button, Tabs, Input, Space, Spin, message } from "antd";
 import { useTranslation } from "react-i18next";
 import { PlusSquareOutlined, UndoOutlined } from "@ant-design/icons";
 import BucketList from "@/components/BucketManagement/BucketList";
@@ -32,6 +32,10 @@ const BucketContainer: React.FC<{
       setBuckets(res.data);
     } catch (err: any) {
       console.log("err", err);
+      message.open({
+        type: "error",
+        content: err.message,
+      });
     } finally {
       setLoadding(false);
     }

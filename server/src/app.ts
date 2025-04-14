@@ -22,7 +22,9 @@ export const createApp = () => {
     if (!bucketManager && accessKey && secretKey) {
       bucketManager = getBucketManager(accessKey, secretKey);
     }
-    ctx.bucketManager = bucketManager;
+    if (bucketManager) {
+      ctx.bucketManager = bucketManager;
+    }
     await next();
   });
   app.use(qiniuRouter.routes()).use(qiniuRouter.allowedMethods());

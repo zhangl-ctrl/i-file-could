@@ -1,6 +1,6 @@
 class Logger {
   config: any;
-  constructor(config = {}) {}
+  constructor() {}
   // 添加记录
   addLogger() {}
   // 删除记录

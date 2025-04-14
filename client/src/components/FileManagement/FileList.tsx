@@ -23,7 +23,7 @@ import type { MenuProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { getQiniuFilelist, getQiniuFileDetail } from "@/api/qiniuService";
+import { getQiniuFilelist } from "@/api/qiniuService";
 import formatFileSize from "@/utils/formatFileSize";
 import { STORAGE_TYPE } from "@/common/cloudService";
 import formatDate from "@/utils/formatDate";
@@ -231,13 +231,13 @@ const FileList: React.FC = () => {
     const key = currentDirectory + directory;
     const createDirectory = qiniuManger.createDirectory(key, token);
     createDirectory.observer({
-      next(res: any) {},
+      next(_: any) {},
       error(err: Error) {
         setCreateDirLoadding(false);
         setShowDirectoryModal(false);
         messageApi.error(err.message);
       },
-      complete(res: any) {
+      complete(_: any) {
         setCreateDirLoadding(false);
         setShowDirectoryModal(false);
         messageApi.success("新建成功");

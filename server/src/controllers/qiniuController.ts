@@ -3,7 +3,6 @@ import qiniu from "qiniu";
 import { nanoid } from "nanoid";
 import errorHttpCode from "../common/errorHttpCode";
 import axios from "axios";
-import dayjs from "dayjs";
 import {
   getCdnFlow,
   getTodaySpaceAmount,
@@ -63,6 +62,17 @@ const qiniuController = {
   // 获取存储桶列表
   async getBuckets(ctx: Koa.Context) {
     const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    console.log("bucketManager", bucketManager);
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     let buckets: any[] = [];
     try {
       const bucketNames = await new Promise<string[]>((resolve, reject) => {
@@ -126,12 +136,22 @@ const qiniuController = {
   },
   // 根据存储桶获取文件列表
   async getFileList(ctx: Koa.Context) {
+    const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     const { bucket } = ctx.request.body as {
       accessKey: string;
       secretKey: string;
       bucket: string;
     };
-    const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
     async function buildFileTree(prefix: string = "") {
       const options = {
         limit: 1000,
@@ -193,8 +213,18 @@ const qiniuController = {
   },
   // 创建存储桶
   async createBucket(ctx: Koa.Context) {
-    const { bucket, regionId, auth } = ctx.request.body as Record<string, any>;
     const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
+    const { bucket, regionId } = ctx.request.body as Record<string, any>;
     const options = {
       regionId,
     };
@@ -209,8 +239,18 @@ const qiniuController = {
   },
   // 删除存储桶
   async deleteBucket(ctx: Koa.Context) {
-    const { bucket } = ctx.request.body as Record<string, any>;
     const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
+    const { bucket } = ctx.request.body as Record<string, any>;
     const res = await bucketManager.deleteBucket(bucket);
     const { data, resp } = res;
     ctx.body = {
@@ -222,11 +262,21 @@ const qiniuController = {
   },
   // 获取文件详情
   async getFileDetail(ctx: Koa.Context) {
+    const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     const { key, bucket, accessKey, secretKey } = ctx.request.body as Record<
       string,
       any
     >;
-    const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
     const res = await bucketManager.stat(bucket, key);
     ctx.body = {
       code: 200,
@@ -235,8 +285,18 @@ const qiniuController = {
   },
   // 根据存储桶获取域名
   async getDomainsByBucket(ctx: Koa.Context) {
-    const { bucket } = ctx.request.body as Record<string, any>;
     const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
+    const { bucket } = ctx.request.body as Record<string, any>;
     try {
       const res = await bucketManager.listBucketDomains(bucket);
       const { data, resp } = res;
@@ -252,9 +312,28 @@ const qiniuController = {
   },
   // 获取文件下载链接
   async getFileDownloadLink(ctx: Koa.Context) {
-    const { domain, key, auth } = ctx.request.body as Record<string, any>;
     const bucketManager: qiniu.rs.BucketManager = ctx.bucketManager;
-
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
+    if (!bucketManager) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
+    const { domain, key, auth } = ctx.request.body as Record<string, any>;
     // 0：公开，1：私有
     if (auth === 0) {
       const privateUrl = bucketManager.publicDownloadUrl(
@@ -285,6 +364,16 @@ const qiniuController = {
   // 获取存储桶空间使用量数据
   async getSpaceOverview(ctx: Koa.Context) {
     const { accessKey, secretKey } = ctx.request.body as Record<string, any>;
+    if (!accessKey || !secretKey) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
     const requestUrl =
       "https://uc.qiniuapi.com/v3/buckets?line=false&product=kodo&shared=true";
@@ -319,6 +408,16 @@ const qiniuController = {
       string,
       any
     >;
+    if (!accessKey || !secretKey) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
     const requestUrl = `http://api.qiniuapi.com/v6/space?begin=${begin}&end=${end}&g=day&disable_ctime=true&product=kodo&fogRegionsEnable=true`;
     const accessToken = qiniu.util.generateAccessToken(mac, requestUrl);
@@ -349,6 +448,16 @@ const qiniuController = {
   // 获取标准存储今日空间存储量
   async getTodaySpaceAmount(ctx: Koa.Context) {
     const { accessKey, secretKey } = ctx.request.body as Record<string, any>;
+    if (!accessKey || !secretKey) {
+      ctx.status = 401;
+      ctx.body = {
+        code: 401,
+        success: false,
+        message: "认证授权失败",
+        data: null,
+      };
+      return;
+    }
     const response: Record<string, any> = {};
     try {
       const res1 = await getCdnFlow(accessKey, secretKey);

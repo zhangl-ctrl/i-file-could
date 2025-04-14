@@ -25,7 +25,7 @@ const FileUpload: React.FC = () => {
       state.cloudService.qiniuService.bucketTokens[bucket as string]?.token
   );
   const currentCrumbs = useSelector((state: any) => state.status.currentCrumbs);
-  const beforeUpload = (file: UploadFile, list: UploadFile[]) => {
+  const beforeUpload = (_: UploadFile, list: UploadFile[]) => {
     setFileList([...fileList, ...list]);
     const directorys = currentCrumbs.slice(1).join("");
     const fileInfoList = list.map((file: UploadFile) => {
@@ -62,7 +62,7 @@ const FileUpload: React.FC = () => {
         });
       },
       error(err: Error) {
-        // console.log("error", err);
+        console.log("error", err);
         let status: FileUploadStatus = "error";
         setCurrentUploadFile((currentUploadFile: any) => {
           return currentUploadFile.map((item: any) => {
@@ -71,7 +71,7 @@ const FileUpload: React.FC = () => {
         });
       },
       complete(res: any) {
-        // console.log("complete", res);
+        console.log("complete", res);
         let status: FileUploadStatus = "success";
         setCurrentUploadFile((currentUploadFile: any) => {
           return currentUploadFile.map((item: any) => {
