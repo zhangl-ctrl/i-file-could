@@ -1,3 +1,3 @@
 import type { Plugin } from "vite";
 
-console.log("测试");
+console.log("测试111");
