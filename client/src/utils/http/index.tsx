@@ -8,6 +8,8 @@ import axios, {
 import { ApiResponse, HttpClientConfig } from "./type";
 import qiniuLogger from "@/utils/Logger/QiniuLogger";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 class Http {
   private instance: AxiosInstance;
   // private readonly config: HttpClientConfig;
@@ -181,7 +183,7 @@ class Http {
 }
 
 const http = new Http({
-  baseURL: "http://localhost:3000",
+  baseURL: BASE_URL,
   timeout: 15000,
 });
 
